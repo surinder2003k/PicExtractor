@@ -2,7 +2,7 @@
 
 Extract every frame from your videos right in the browser. No uploads, no server — 100% private.
 
-**Live:** https://picextracter.vercel.app
+**Live:** https://picextractor.vercel.app
 
 ## Features
 
