@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://picsnap.vercel.app";
+  const baseUrl = "https://picextracter.vercel.app";
   return [
     {
       url: baseUrl,

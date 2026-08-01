@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "PicSnap — Video Screenshot Extractor",
-    template: "%s · PicSnap",
+    default: "PicExtractor — Video Screenshot Extractor",
+    template: "%s · PicExtractor",
   },
   description:
     "Extract every frame from your videos right in the browser. PNG/JPEG/WebP, time ranges, ZIP download, and more. No uploads, no server.",
@@ -32,17 +32,17 @@ export const metadata: Metadata = {
     "PNG",
     "WebP",
   ],
-  applicationName: "PicSnap",
+  applicationName: "PicExtractor",
   openGraph: {
-    title: "PicSnap — Video Screenshot Extractor",
+    title: "PicExtractor — Video Screenshot Extractor",
     description:
       "Extract every frame from your videos right in the browser. PNG/JPEG/WebP, time ranges, ZIP download. No uploads, no server.",
     type: "website",
-    siteName: "PicSnap",
+    siteName: "PicExtractor",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PicSnap — Video Screenshot Extractor",
+    title: "PicExtractor — Video Screenshot Extractor",
     description:
       "Extract every frame from your videos right in the browser. PNG/JPEG/WebP, time ranges, ZIP download. No uploads, no server.",
   },
@@ -67,7 +67,7 @@ export default function RootLayout({
                 <Clapperboard className="h-4 w-4" />
               </span>
               <span>
-                PicSnap <span className="hidden text-muted-foreground sm:inline">· Video Screenshot Extractor</span>
+                PicExtractor <span className="hidden text-muted-foreground sm:inline">· Video Screenshot Extractor</span>
               </span>
             </Link>
             <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <footer className="border-t border-border/60 py-6">
           <p className="text-center text-sm text-muted-foreground">
-            PicSnap — everything runs locally in your browser. Your videos never leave your device.
+            PicExtractor — everything runs locally in your browser. Your videos never leave your device.
           </p>
         </footer>
         <Toaster richColors position="top-center" />

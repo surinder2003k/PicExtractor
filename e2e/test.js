@@ -33,7 +33,7 @@ function check(name, cond, extra = "") {
 
   console.log("== Landing page ==");
   await page.goto(BASE, { waitUntil: "networkidle" });
-  check("landing title", (await page.title()).includes("PicSnap"));
+  check("landing title", (await page.title()).includes("PicExtractor"));
   check("landing h1", (await page.locator("h1").first().textContent()).includes("Extract every frame"));
   await page.locator('a[href="/extractor"]').first().click();
   await page.waitForURL("**/extractor");

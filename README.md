@@ -1,10 +1,12 @@
-# PicSnap — Video Screenshot Extractor
+# PicExtractor — Video Screenshot Extractor
 
 Extract every frame from your videos right in the browser. No uploads, no server — 100% private.
 
+**Live:** https://picextracter.vercel.app
+
 ## Features
 
-- **Lightning fast** — parallel frame extraction with a smart seek pool
+- **Super fast** — parallel frame extraction with a smart seek pool
 - **Every frame** — millisecond-precision frame capture from your video
 - **Multiple formats** — export as PNG, JPEG, or WebP with quality control
 - **Time range control** — extract only the section you need

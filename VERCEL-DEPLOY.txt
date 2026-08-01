@@ -1,0 +1,83 @@
+=====================================================================
+ PicSnap — Vercel Deploy Guide
+=====================================================================
+
+GOOD NEWS: This app needs NO environment variables.
+It's 100% client-side (no server, no database, no auth, no API keys).
+
+The project is already pushed to GitHub:
+    https://github.com/surinder2003k/picextracter
+
+---------------------------------------------------------------------
+STEP-BY-STEP (GitHub import method — recommended)
+---------------------------------------------------------------------
+
+1. Go to:  https://vercel.com/new
+
+2. Sign in with your GitHub account (surinder2003k).
+
+3. Click "Import" next to the "picextracter" repository.
+
+4. Click "Deploy" — accept all defaults. Do NOT change anything.
+   - Framework: Next.js (auto-detected)
+   - Build command: (leave default)  →  npm run build
+   - Output directory: (leave empty)
+
+5. Wait ~1 minute for the build to finish. You'll see a green
+   "Congratulations" screen with your live URL like:
+       https://picextracter-<hash>.vercel.app
+
+DONE! Your app is live.
+
+---------------------------------------------------------------------
+NICE-TO-HAVE: Add a custom domain
+---------------------------------------------------------------------
+
+1. In the Vercel dashboard, open your project → Settings → Domains.
+2. Type your domain (e.g. picsnap.com) and click "Add".
+3. Follow Vercel's DNS instructions at your domain registrar
+   (add the A/AAAA records or CNAME shown).
+4. Wait for DNS to propagate (5 min – 48h).
+
+---------------------------------------------------------------------
+IMPORTANT: Update sitemap URL after you get your domain
+---------------------------------------------------------------------
+
+The repo has `app/sitemap.ts` and `app/robots.ts` pointing to:
+    https://picsnap.vercel.app
+
+After deployment, replace that placeholder with your REAL URL, e.g.:
+    https://picextracter-<hash>.vercel.app   (or your custom domain)
+
+Files to edit:
+    app/sitemap.ts   →  const baseUrl = "https://YOUR-URL"
+    app/robots.ts    →  sitemap: "https://YOUR-URL/sitemap.xml"
+
+Then commit & push, and Vercel auto-redeploys.
+
+---------------------------------------------------------------------
+Redeploying after future changes
+---------------------------------------------------------------------
+
+Just push to GitHub (git push origin main) — Vercel auto-deploys
+every push to main. No manual steps needed.
+
+---------------------------------------------------------------------
+How to verify it's working
+---------------------------------------------------------------------
+
+- Open your Vercel URL → landing page should load.
+- Click "Start Extracting" → upload a video → extract frames.
+- Check https://YOUR-URL/robots.txt and /sitemap.xml return content.
+- Everything runs in the browser — no server involved.
+
+---------------------------------------------------------------------
+Optional env vars (NOT required — only if you ever need them)
+---------------------------------------------------------------------
+
+NEXT_PUBLIC_APP_URL  = https://your-domain.com
+  → Optional. Only useful if we later add share links/links that
+    need to know their own URL. Currently unused.
+
+(That's it — no other env vars exist in this project.)
+=====================================================================

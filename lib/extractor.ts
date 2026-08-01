@@ -17,7 +17,7 @@ export interface ExtractOptions {
   onProgress: (p: ProgressState) => void;
 }
 
-const POOL_SIZE = 4;
+const MAX_POOL_SIZE = 8;
 const SEEK_TIMEOUT_MS = 8000;
 
 function buildTimestamps(duration: number, intervalMs: number, startTime: number, endTime: number): number[] {
@@ -49,10 +49,10 @@ function seekTo(video: HTMLVideoElement, time: number, signal: AbortSignal): Pro
       window.clearTimeout(timer);
     };
     const onSeeked = () => {
-      // Give the decoder a frame to present before drawing.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => finish(true));
-      });
+      // Let the decoder present the frame before drawing. A single rAF is
+      // enough (the frame is already decoded by the time "seeked" fires);
+      // this avoids occasional stale/blank captures from drawing too early.
+      requestAnimationFrame(() => finish(true));
     };
     video.addEventListener("seeked", onSeeked);
     const timer = window.setTimeout(() => finish(false), SEEK_TIMEOUT_MS);
@@ -64,11 +64,27 @@ function seekTo(video: HTMLVideoElement, time: number, signal: AbortSignal): Pro
   });
 }
 
+let hiddenHost: HTMLDivElement | null = null;
+
+function getHiddenHost(): HTMLDivElement {
+  if (!hiddenHost) {
+    hiddenHost = document.createElement("div");
+    hiddenHost.style.cssText =
+      "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;";
+    document.body.appendChild(hiddenHost);
+  }
+  return hiddenHost;
+}
+
 async function loadVideoElement(src: string): Promise<HTMLVideoElement> {
   const video = document.createElement("video");
-  video.preload = "auto";
+  // metadata only: we seek frame-by-frame, so preloading the whole file into
+  // each of the pool elements would multiply memory use by the pool size.
+  video.preload = "metadata";
   video.muted = true;
   video.playsInline = true;
+  // Attach to the DOM (hidden) so seeking reliably fires "seeked" events.
+  getHiddenHost().appendChild(video);
   video.src = src;
   await new Promise<void>((resolve, reject) => {
     const onLoaded = () => resolve();
@@ -115,25 +131,36 @@ export async function extractFrames(opts: ExtractOptions): Promise<ExtractResult
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) throw new Error("Canvas 2D context unavailable");
 
-  let nextIndex = 0;
   let completed = 0;
+  let lastReport = 0;
 
-  const report = () =>
-    onProgress({
-      done: completed,
-      total,
-      elapsedMs: Date.now() - startedAt,
-    });
+  const report = () => {
+    const now = Date.now();
+    // Throttle progress pushes to ~20/sec to avoid drowning the UI in
+    // state updates while hundreds of frames complete per second.
+    if (now - lastReport >= 50 || completed === total) {
+      lastReport = now;
+      onProgress({
+        done: completed,
+        total,
+        elapsedMs: now - startedAt,
+      });
+    }
+  };
 
-  const worker = async () => {
+  const worker = async (indices: number[]) => {
+    if (indices.length === 0) return;
     const video = await loadVideoElement(src);
     try {
-      while (true) {
+      // Seek only forward through a contiguous chunk: the browser keeps the
+      // decoder positioned, so forward seeks are far cheaper than random access.
+      let lastTime = -1;
+      for (const idx of indices) {
         if (signal.aborted) return;
-        const idx = nextIndex++;
-        if (idx >= total) return;
         const time = timestamps[idx];
-        const ok = await seekTo(video, time, signal);
+        // Seek forward, but if a time is somehow below the current position,
+        // still set it (handles non-monotonic edge cases safely).
+        const ok = await seekTo(video, Math.max(time, lastTime), signal);
         if (ok) {
           try {
             ctx.drawImage(video, 0, 0, width, height);
@@ -149,18 +176,25 @@ export async function extractFrames(opts: ExtractOptions): Promise<ExtractResult
             results[idx] = null;
           }
         }
+        lastTime = Math.max(lastTime, time);
         completed++;
         report();
-        await new Promise((r) => setTimeout(r, 0));
       }
     } finally {
       video.removeAttribute("src");
       video.load();
+      video.remove();
     }
   };
 
-  const poolSize = Math.max(1, Math.min(POOL_SIZE, total));
-  await Promise.all(Array.from({ length: poolSize }, () => worker()));
+  const poolSize = Math.max(1, Math.min(MAX_POOL_SIZE, total, navigator.hardwareConcurrency || 4));
+  // Split timestamps into contiguous chunks, one per worker. Each chunk stays
+  // within a narrow time window so all seeks are short forward hops.
+  const chunks: number[][] = Array.from({ length: poolSize }, () => []);
+  for (let i = 0; i < total; i++) {
+    chunks[Math.floor((i * poolSize) / total)].push(i);
+  }
+  await Promise.all(chunks.map((c) => worker(c)));
 
   const frames = results.filter((f): f is ExtractedFrame => f !== null);
   report();
