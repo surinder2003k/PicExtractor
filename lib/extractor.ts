@@ -19,6 +19,98 @@ export interface ExtractOptions {
 
 const MAX_POOL_SIZE = 8;
 const SEEK_TIMEOUT_MS = 8000;
+const MAX_ENCODER_WORKERS = 4;
+
+/** Inline source for the encoding worker (avoids bundler-specific worker support). */
+const ENCODER_WORKER_SOURCE = `
+self.onmessage = async function (e) {
+  var d = e.data;
+  var id = d.id;
+  var bitmap = d.bitmap;
+  var format = d.format;
+  var quality = d.quality;
+  try {
+    var canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    var ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("no 2d ctx");
+    ctx.drawImage(bitmap, 0, 0);
+    bitmap.close();
+    var mime = format === "jpeg" ? "image/jpeg" : format === "webp" ? "image/webp" : "image/png";
+    var blob = await canvas.convertToBlob({ type: mime, quality: quality });
+    var reader = new FileReaderSync();
+    self.postMessage({ id: id, dataUrl: reader.readAsDataURL(blob) });
+  } catch (err) {
+    try { bitmap.close(); } catch (_) {}
+    self.postMessage({ id: id, error: String(err) });
+  }
+};
+`;
+
+const encoderWorkers: Worker[] = [];
+const encoderPending = new Map<number, { resolve: (v: string) => void; reject: () => void }>();
+let encoderNextId = 0;
+let encoderRR = 0;
+let encoderPoolReady = false;
+
+function supportsWorkerEncode(): boolean {
+  return (
+    typeof Worker !== "undefined" &&
+    typeof OffscreenCanvas !== "undefined" &&
+    typeof createImageBitmap === "function" &&
+    typeof Blob === "function" &&
+    typeof URL === "function"
+  );
+}
+
+function ensureEncoderPool(): boolean {
+  if (encoderPoolReady) return encoderWorkers.length > 0;
+  encoderPoolReady = true;
+  if (!supportsWorkerEncode()) return false;
+  try {
+    const blobUrl = URL.createObjectURL(new Blob([ENCODER_WORKER_SOURCE], { type: "application/javascript" }));
+    const count = Math.max(1, Math.min(MAX_ENCODER_WORKERS, navigator.hardwareConcurrency || 2));
+    for (let i = 0; i < count; i++) {
+      const w = new Worker(blobUrl);
+      w.onmessage = (e) => {
+        const { id, dataUrl, error } = e.data as { id: number; dataUrl?: string; error?: string };
+        const p = encoderPending.get(id);
+        if (!p) return;
+        encoderPending.delete(id);
+        if (error) p.reject();
+        else p.resolve(dataUrl ?? "");
+      };
+      w.onerror = () => {
+        // Fall back to the synchronous path for this request.
+        encoderPending.forEach((p) => p.reject());
+        encoderPending.clear();
+        encoderWorkers.forEach((x) => x.terminate());
+        encoderWorkers.length = 0;
+      };
+      encoderWorkers.push(w);
+    }
+    return encoderWorkers.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function encodeOffMainThread(bitmap: ImageBitmap, format: FrameFormat, quality: number): Promise<string> {
+  if (encoderWorkers.length === 0) {
+    bitmap.close();
+    return Promise.reject(new Error("no encoder workers"));
+  }
+  const id = ++encoderNextId;
+  const w = encoderWorkers[encoderRR++ % encoderWorkers.length];
+  return new Promise((resolve, reject) => {
+    encoderPending.set(id, { resolve, reject });
+    try {
+      w.postMessage({ id, bitmap, format, quality }, [bitmap]);
+    } catch {
+      encoderPending.delete(id);
+      reject();
+    }
+  });
+}
 
 function buildTimestamps(duration: number, intervalMs: number, startTime: number, endTime: number): number[] {
   const start = Math.max(0, startTime);
@@ -125,11 +217,12 @@ export async function extractFrames(opts: ExtractOptions): Promise<ExtractResult
 
   const startedAt = Date.now();
   const results: (ExtractedFrame | null)[] = new Array(total).fill(null);
+  // Fallback encoder (main thread) used only when worker encoding is unavailable.
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  if (!ctx) throw new Error("Canvas 2D context unavailable");
+  const useWorker = ensureEncoderPool();
 
   let completed = 0;
   let lastReport = 0;
@@ -163,12 +256,28 @@ export async function extractFrames(opts: ExtractOptions): Promise<ExtractResult
         const ok = await seekTo(video, Math.max(time, lastTime), signal);
         if (ok) {
           try {
-            ctx.drawImage(video, 0, 0, width, height);
+            let dataUrl: string;
+            try {
+              if (useWorker && typeof createImageBitmap === "function") {
+                // Capture the presented frame as a bitmap and encode it on a
+                // worker thread so the main thread can keep seeking frames in
+                // parallel instead of blocking on a synchronous toDataURL().
+                const bitmap = await createImageBitmap(video);
+                dataUrl = await encodeOffMainThread(bitmap, format, quality);
+              } else {
+                throw new Error("worker encode unavailable");
+              }
+            } catch {
+              // Fall back to the synchronous main-thread encoder.
+              if (!ctx) throw new Error("no canvas context");
+              ctx.drawImage(video, 0, 0, width, height);
+              dataUrl = canvas.toDataURL(getMime(format), quality);
+            }
             results[idx] = {
               id: idx,
               timestamp: time,
               formattedTime: formatTime(time),
-              dataUrl: canvas.toDataURL(getMime(format), quality),
+              dataUrl,
               width,
               height,
             };

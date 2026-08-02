@@ -53,9 +53,11 @@ function check(name, cond, extra = "") {
   check("duration shown", await page.getByText("00:00:10.000").first().isVisible());
   check("resolution shown", await page.getByText("320 × 240").isVisible());
   check("interval estimate ~20 frames", await page.getByText("~20 frames").isVisible());
+  check("default format is JPEG", (await page.getByRole("button", { name: "JPEG" }).getAttribute("aria-pressed")) === "true");
   check("extract now enabled", await page.getByRole("button", { name: "Extract All Frames" }).isEnabled());
 
   console.log("== Full extraction (PNG) ==");
+  await page.getByRole("button", { name: "PNG" }).click();
   const t0 = Date.now();
   await page.getByRole("button", { name: "Extract All Frames" }).click();
   await page.waitForSelector("text=Frames (20)", { timeout: 30000 });

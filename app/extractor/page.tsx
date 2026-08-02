@@ -43,18 +43,18 @@ interface SavedSettings {
 }
 
 function loadSettings(): SavedSettings {
-  if (typeof window === "undefined") return { intervalMs: 500, format: "png", quality: 85 };
+  if (typeof window === "undefined") return { intervalMs: 500, format: "jpeg", quality: 85 };
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return { intervalMs: 500, format: "png", quality: 85 };
+    if (!raw) return { intervalMs: 500, format: "jpeg", quality: 85 };
     const parsed = JSON.parse(raw) as Partial<SavedSettings>;
     return {
       intervalMs: typeof parsed.intervalMs === "number" ? parsed.intervalMs : 500,
-      format: (FORMATS.some((f) => f.value === parsed.format) ? parsed.format : "png") as FrameFormat,
+      format: (FORMATS.some((f) => f.value === parsed.format) ? parsed.format : "jpeg") as FrameFormat,
       quality: typeof parsed.quality === "number" ? parsed.quality : 85,
     };
   } catch {
-    return { intervalMs: 500, format: "png", quality: 85 };
+    return { intervalMs: 500, format: "jpeg", quality: 85 };
   }
 }
 
