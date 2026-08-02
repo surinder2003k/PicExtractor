@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Dropzone, SelectedFileBadge, validationMessage } from "@/components/dropzone";
 import { FrameCard } from "@/components/frame-card";
+import { Lightbox } from "@/components/lightbox";
 import { extractFrames } from "@/lib/extractor";
 import {
   captureFrameAtTime,
@@ -85,6 +86,7 @@ export default function Extractor() {
   const [progress, setProgress] = useState({ done: 0, total: 0, elapsedMs: 0 });
   const [frames, setFrames] = useState<ExtractedFrame[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [zipping, setZipping] = useState(false);
   const [zipProgress, setZipProgress] = useState(0);
@@ -271,6 +273,20 @@ export default function Extractor() {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
+      return next;
+    });
+  };
+
+  const openViewer = (frame: ExtractedFrame) => {
+    const idx = frames.findIndex((f) => f.id === frame.id);
+    setViewerIndex(idx >= 0 ? idx : 0);
+  };
+
+  const stepViewer = (dir: 1 | -1) => {
+    setViewerIndex((prev) => {
+      if (prev === null) return prev;
+      const next = prev + dir;
+      if (next < 0 || next >= frames.length) return prev;
       return next;
     });
   };
@@ -581,7 +597,7 @@ export default function Extractor() {
                     frame={frame}
                     selected={selected.has(frame.id)}
                     onToggle={() => toggleFrame(frame.id)}
-                    onOpen={() => window.open(frame.dataUrl, "_blank")}
+                    onOpen={() => openViewer(frame)}
                     onDownload={() => {
                       downloadSingleFrame(frame, file?.name ?? "video");
                       toast.success("Frame downloaded.");
@@ -609,6 +625,28 @@ export default function Extractor() {
           )}
         </div>
       </div>
+
+      {viewerIndex !== null && frames[viewerIndex] && (
+        <Lightbox
+          frames={frames}
+          index={viewerIndex}
+          onClose={() => setViewerIndex(null)}
+          onPrev={() => stepViewer(-1)}
+          onNext={() => stepViewer(1)}
+          onDownload={(frame) => {
+            downloadSingleFrame(frame, file?.name ?? "video");
+            toast.success("Frame downloaded.");
+          }}
+          onCopy={async (frame) => {
+            try {
+              await copyFrameToClipboard(frame);
+              toast.success("Frame copied to clipboard.");
+            } catch {
+              toast.error("Could not copy image to clipboard.");
+            }
+          }}
+        />
+      )}
 
       {contextMenu && (
         <div
