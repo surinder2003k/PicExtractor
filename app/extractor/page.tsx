@@ -102,6 +102,7 @@ export default function Extractor() {
       setVideoUrl(url);
       setFrames([]);
       setSelected(new Set());
+      setViewerIndex(null);
       setProgress({ done: 0, total: 0, elapsedMs: 0 });
       setError(null);
       try {
@@ -130,6 +131,7 @@ export default function Extractor() {
     setVideoHeight(0);
     setFrames([]);
     setSelected(new Set());
+    setViewerIndex(null);
     setProgress({ done: 0, total: 0, elapsedMs: 0 });
     setError(null);
   }, []);
@@ -200,6 +202,7 @@ export default function Extractor() {
     setSelected(new Set());
     setProgress({ done: 0, total: 0, elapsedMs: 0 });
     setError(null);
+    setViewerIndex(null);
     try {
       const result = await extractFrames({
         src: videoUrl,
