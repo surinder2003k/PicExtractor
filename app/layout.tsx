@@ -72,6 +72,12 @@ export default function RootLayout({
             </Link>
             <div className="flex items-center gap-2">
               <Link
+                href="/tools"
+                className="inline-flex h-9 items-center rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              >
+                Tools
+              </Link>
+              <Link
                 href="/extractor"
                 className="inline-flex h-9 items-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
               >
