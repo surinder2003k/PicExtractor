@@ -43,6 +43,10 @@ import {
   SpellCheck,
   Eraser,
   Keyboard,
+  ShieldQuestion,
+  FileUser,
+  TrendingUp,
+  Accessibility,
 } from "lucide-react";
 
 const tools = [
@@ -321,6 +325,36 @@ const tools = [
     title: "Typing Speed Test",
     description: "Measure your WPM and accuracy live.",
     href: "/tools/typing",
+  },
+  {
+    icon: ShieldQuestion,
+    title: "Password Strength",
+    description: "Entropy, crack time, and best-practice checks.",
+    href: "/tools/strength",
+  },
+  {
+    icon: FileUser,
+    title: "Resume Builder",
+    description: "Build a clean resume and print to PDF.",
+    href: "/tools/resume",
+  },
+  {
+    icon: TrendingUp,
+    title: "Compound Interest",
+    description: "Lump sum + SIP growth with compounding.",
+    href: "/tools/interest",
+  },
+  {
+    icon: Accessibility,
+    title: "Contrast Checker",
+    description: "WCAG AA/AAA checks for color pairs.",
+    href: "/tools/contrast",
+  },
+  {
+    icon: CalendarDays,
+    title: "Date Add / Subtract",
+    description: "Days from today, deadlines, due dates.",
+    href: "/tools/date-math",
   },
 ];
 
