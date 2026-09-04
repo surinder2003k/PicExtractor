@@ -72,6 +72,12 @@ export default function RootLayout({
             </Link>
             <div className="flex items-center gap-2">
               <Link
+                href="/cheatsheets"
+                className="hidden h-9 items-center rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:inline-flex"
+              >
+                Cheat Sheets
+              </Link>
+              <Link
                 href="/tools"
                 className="inline-flex h-9 items-center rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               >
@@ -88,10 +94,51 @@ export default function RootLayout({
           </div>
         </header>
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-border/60 py-6">
-          <p className="text-center text-sm text-muted-foreground">
-            PicExtractor — everything runs locally in your browser. Your videos never leave your device.
-          </p>
+        <footer className="border-t border-border/60">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-10 sm:grid-cols-4 sm:px-6">
+            <div className="col-span-2 sm:col-span-1">
+              <p className="flex items-center gap-2 font-semibold">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <Clapperboard className="h-3.5 w-3.5" />
+                </span>
+                PicExtractor
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                Free browser-based tools. Everything runs locally — your files never leave your device.
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Main</p>
+              <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                <li><Link href="/extractor" className="transition-colors hover:text-foreground">Frame Extractor</Link></li>
+                <li><Link href="/tools" className="transition-colors hover:text-foreground">All Tools</Link></li>
+                <li><Link href="/cheatsheets" className="transition-colors hover:text-foreground">Cheat Sheets</Link></li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Popular Tools</p>
+              <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                <li><Link href="/tools/currency" className="transition-colors hover:text-foreground">Currency Converter</Link></li>
+                <li><Link href="/tools/qr-code" className="transition-colors hover:text-foreground">QR Generator</Link></li>
+                <li><Link href="/tools/invoice" className="transition-colors hover:text-foreground">Invoice Generator</Link></li>
+                <li><Link href="/tools/image-compressor" className="transition-colors hover:text-foreground">Image Compressor</Link></li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Resources</p>
+              <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                <li><Link href="/cheatsheets" className="transition-colors hover:text-foreground">Git Reference</Link></li>
+                <li><Link href="/cheatsheets" className="transition-colors hover:text-foreground">Regex Patterns</Link></li>
+                <li><Link href="/cheatsheets" className="transition-colors hover:text-foreground">HTTP Codes</Link></li>
+                <li><Link href="/cheatsheets" className="transition-colors hover:text-foreground">Excel Shortcuts</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-border/60 py-4">
+            <p className="text-center text-xs text-muted-foreground">
+              © {new Date().getFullYear()} PicExtractor — no uploads, no accounts, no limits.
+            </p>
+          </div>
         </footer>
         <Toaster richColors position="top-center" />
       </body>
