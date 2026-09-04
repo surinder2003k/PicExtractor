@@ -9,6 +9,15 @@ import {
   KeyRound,
   Ruler,
   CalendarRange,
+  Coins,
+  CalendarDays,
+  BookOpen,
+  Wifi,
+  CloudSun,
+  QrCode,
+  Fingerprint,
+  Hash,
+  Type,
 } from "lucide-react";
 
 const tools = [
@@ -65,6 +74,60 @@ const tools = [
     title: "Duration Calculator",
     description: "Days/months/years between two dates (age or tenure)",
     href: "/tools/duration",
+  },
+  {
+    icon: Coins,
+    title: "Currency Converter",
+    description: "Live exchange rates for 160+ currencies, updated daily.",
+    href: "/tools/currency",
+  },
+  {
+    icon: CalendarDays,
+    title: "Public Holidays",
+    description: "Official holidays by country — plan leaves and deadlines.",
+    href: "/tools/holidays",
+  },
+  {
+    icon: BookOpen,
+    title: "Dictionary",
+    description: "Instant word definitions, phonetics, and synonyms.",
+    href: "/tools/dictionary",
+  },
+  {
+    icon: Wifi,
+    title: "My IP & Network",
+    description: "See your public IP, location, ISP, and timezone.",
+    href: "/tools/my-ip",
+  },
+  {
+    icon: CloudSun,
+    title: "Weather Check",
+    description: "Current weather for any city, free and instant.",
+    href: "/tools/weather",
+  },
+  {
+    icon: QrCode,
+    title: "QR Code Generator",
+    description: "Turn links or text into downloadable QR codes.",
+    href: "/tools/qr-code",
+  },
+  {
+    icon: Fingerprint,
+    title: "UUID Generator",
+    description: "Cryptographically random UUID v4 IDs, in bulk.",
+    href: "/tools/uuid",
+  },
+  {
+    icon: Hash,
+    title: "Hash Generator",
+    description: "SHA-1/256/384/512 checksums via Web Crypto.",
+    href: "/tools/hash",
+  },
+  {
+    icon: Type,
+    title: "Lorem Ipsum",
+    description: "Placeholder text for mockups, decks, and templates.",
+    href: "/tools/lorem",
   },
 ];
 
