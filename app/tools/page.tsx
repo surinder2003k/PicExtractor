@@ -52,6 +52,10 @@ import {
   Scale,
   PenLine,
   Hourglass,
+  Image,
+  Music,
+  Divide,
+  FileCode2,
 } from "lucide-react";
 
 const tools = [
@@ -390,6 +394,36 @@ const tools = [
     title: "Countdown Timer",
     description: "Meetings, sprints, and breaks — beep on zero.",
     href: "/tools/countdown",
+  },
+  {
+    icon: KeyRound,
+    title: "JWT Decoder",
+    description: "Inspect token header & payload locally.",
+    href: "/tools/jwt",
+  },
+  {
+    icon: Image,
+    title: "SVG Placeholder",
+    description: "Mockup images for layouts — instant SVG.",
+    href: "/tools/placeholder",
+  },
+  {
+    icon: Music,
+    title: "Metronome",
+    description: "Click track with accented first beat.",
+    href: "/tools/metronome",
+  },
+  {
+    icon: Divide,
+    title: "Fraction Calculator",
+    description: "Add, subtract, multiply, divide fractions.",
+    href: "/tools/fractions",
+  },
+  {
+    icon: FileCode2,
+    title: "JSON → TypeScript",
+    description: "Generate TS interfaces from JSON samples.",
+    href: "/tools/json-to-ts",
   },
 ];
 
