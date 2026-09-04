@@ -65,6 +65,11 @@ import {
   Columns3,
   FileOutput,
   Tag,
+  Highlighter,
+  Filter,
+  Sigma,
+  CalendarClock,
+  Smile,
 } from "lucide-react";
 
 const tools = [
@@ -493,6 +498,36 @@ const tools = [
     title: "Regex Tester",
     description: "Live match highlighting and match list.",
     href: "/tools/regex",
+  },
+  {
+    icon: Highlighter,
+    title: "Gradient Text",
+    description: "Gradient headlines with copy-paste CSS.",
+    href: "/tools/gradient-text",
+  },
+  {
+    icon: Filter,
+    title: "CSV Cleaner",
+    description: "Trim, dedupe, and drop empty rows.",
+    href: "/tools/csv-cleaner",
+  },
+  {
+    icon: Sigma,
+    title: "Word Frequency",
+    description: "Spot overused words in your writing.",
+    href: "/tools/word-frequency",
+  },
+  {
+    icon: CalendarClock,
+    title: "Timesheet Calculator",
+    description: "Multiple shifts minus breaks, per day.",
+    href: "/tools/timesheet",
+  },
+  {
+    icon: Smile,
+    title: "Emoji Copier",
+    description: "Click-to-copy emoji for chats and docs.",
+    href: "/tools/emoji",
   },
 ];
 
