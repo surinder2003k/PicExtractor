@@ -31,6 +31,11 @@ import {
   Radio,
   Shuffle,
   Timer,
+  ScrollText,
+  Brush,
+  Link2,
+  Dices,
+  FileArchive,
 } from "lucide-react";
 
 const tools = [
@@ -225,6 +230,36 @@ const tools = [
     title: "Pomodoro Timer",
     description: "25-minute focus sprints with breaks.",
     href: "/tools/pomodoro",
+  },
+  {
+    icon: ScrollText,
+    title: "Roman Numerals",
+    description: "Numbers ⇄ Roman numerals, both directions.",
+    href: "/tools/roman",
+  },
+  {
+    icon: Brush,
+    title: "Gradient Generator",
+    description: "CSS linear gradients with live preview and copy.",
+    href: "/tools/gradient",
+  },
+  {
+    icon: Link2,
+    title: "URL Encoder",
+    description: "Encode/decode query params and URLs safely.",
+    href: "/tools/url-encode",
+  },
+  {
+    icon: Dices,
+    title: "Randomizer",
+    description: "Lucky numbers, coin flips, and dice rolls.",
+    href: "/tools/randomizer",
+  },
+  {
+    icon: FileArchive,
+    title: "Image Compressor",
+    description: "Shrink images locally with a quality slider.",
+    href: "/tools/image-compressor",
   },
 ];
 
