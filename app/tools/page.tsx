@@ -56,6 +56,11 @@ import {
   Music,
   Divide,
   FileCode2,
+  Globe2,
+  Eye,
+  Wallet,
+  Network,
+  Lightbulb,
 } from "lucide-react";
 
 const tools = [
@@ -424,6 +429,36 @@ const tools = [
     title: "JSON → TypeScript",
     description: "Generate TS interfaces from JSON samples.",
     href: "/tools/json-to-ts",
+  },
+  {
+    icon: Globe2,
+    title: "Country Info",
+    description: "Flag, capital, currency, population — instant.",
+    href: "/tools/country",
+  },
+  {
+    icon: Eye,
+    title: "Markdown Preview",
+    description: "Live-rendered markdown as you type.",
+    href: "/tools/markdown-preview",
+  },
+  {
+    icon: Wallet,
+    title: "Bill Reminder",
+    description: "Track due bills locally, spot overdue ones.",
+    href: "/tools/bills",
+  },
+  {
+    icon: Network,
+    title: "Subnet Calculator",
+    description: "CIDR → mask, network, broadcast, hosts.",
+    href: "/tools/subnet",
+  },
+  {
+    icon: Lightbulb,
+    title: "Random Advice",
+    description: "A nugget of wisdom on demand.",
+    href: "/tools/advice",
   },
 ];
 
