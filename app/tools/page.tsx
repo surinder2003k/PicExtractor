@@ -36,6 +36,9 @@ import {
   Link2,
   Dices,
   FileArchive,
+  Utensils,
+  FileText,
+  CalendarCheck,
 } from "lucide-react";
 
 const tools = [
@@ -260,6 +263,30 @@ const tools = [
     title: "Image Compressor",
     description: "Shrink images locally with a quality slider.",
     href: "/tools/image-compressor",
+  },
+  {
+    icon: Utensils,
+    title: "Tip Splitter",
+    description: "Split restaurant bills with tip, per person.",
+    href: "/tools/tip-splitter",
+  },
+  {
+    icon: Utensils,
+    title: "Recipe Scaler",
+    description: "Scale ingredient quantities up or down instantly.",
+    href: "/tools/recipe-scaler",
+  },
+  {
+    icon: FileText,
+    title: "Invoice Generator",
+    description: "Create GST invoices and print or save as PDF.",
+    href: "/tools/invoice",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Habit Tracker",
+    description: "Weekly habit grid, saved in your browser.",
+    href: "/tools/habits",
   },
 ];
 
