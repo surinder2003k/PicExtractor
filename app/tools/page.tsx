@@ -18,6 +18,12 @@ import {
   Fingerprint,
   Hash,
   Type,
+  Binary,
+  Palette,
+  Receipt,
+  HeartPulse,
+  GitCompare,
+  Table,
 } from "lucide-react";
 
 const tools = [
@@ -128,6 +134,42 @@ const tools = [
     title: "Lorem Ipsum",
     description: "Placeholder text for mockups, decks, and templates.",
     href: "/tools/lorem",
+  },
+  {
+    icon: Binary,
+    title: "Base64 Encoder",
+    description: "Encode/decode Base64 — Unicode and URL-safe.",
+    href: "/tools/base64",
+  },
+  {
+    icon: Palette,
+    title: "Color Converter",
+    description: "HEX ⇄ RGB ⇄ HSL with tints and shades.",
+    href: "/tools/color",
+  },
+  {
+    icon: Receipt,
+    title: "GST Calculator",
+    description: "Add or remove GST (5/12/18/28%) with breakdown.",
+    href: "/tools/gst",
+  },
+  {
+    icon: HeartPulse,
+    title: "BMI Calculator",
+    description: "Quick body-mass-index check with categories.",
+    href: "/tools/bmi",
+  },
+  {
+    icon: GitCompare,
+    title: "Text Diff",
+    description: "Compare two texts line by line, git-style + / -.",
+    href: "/tools/text-diff",
+  },
+  {
+    icon: Table,
+    title: "CSV → Markdown",
+    description: "Spreadsheet rows to GitHub/Notion Markdown tables.",
+    href: "/tools/markdown-table",
   },
 ];
 
