@@ -24,6 +24,13 @@ import {
   HeartPulse,
   GitCompare,
   Table,
+  Cake,
+  Percent,
+  Landmark,
+  MonitorSmartphone,
+  Radio,
+  Shuffle,
+  Timer,
 } from "lucide-react";
 
 const tools = [
@@ -170,6 +177,54 @@ const tools = [
     title: "CSV → Markdown",
     description: "Spreadsheet rows to GitHub/Notion Markdown tables.",
     href: "/tools/markdown-table",
+  },
+  {
+    icon: Cake,
+    title: "Age Calculator",
+    description: "Exact age in years, months, and days from DOB.",
+    href: "/tools/age",
+  },
+  {
+    icon: Percent,
+    title: "Percentage Calculator",
+    description: "% of a number, % share, and % change — instantly.",
+    href: "/tools/percentage",
+  },
+  {
+    icon: Landmark,
+    title: "EMI Calculator",
+    description: "Loan EMI, total interest, and total payment.",
+    href: "/tools/emi",
+  },
+  {
+    icon: MonitorSmartphone,
+    title: "Aspect Ratio",
+    description: "Simplify ratios and resize media without distortion.",
+    href: "/tools/aspect-ratio",
+  },
+  {
+    icon: Radio,
+    title: "Morse Code",
+    description: "Translate text ⇄ Morse code for fun and puzzles.",
+    href: "/tools/morse",
+  },
+  {
+    icon: Binary,
+    title: "Number Base",
+    description: "Binary, octal, decimal, hex — all at once.",
+    href: "/tools/number-base",
+  },
+  {
+    icon: Shuffle,
+    title: "Team Picker",
+    description: "Fairly split people into random teams.",
+    href: "/tools/team-picker",
+  },
+  {
+    icon: Timer,
+    title: "Pomodoro Timer",
+    description: "25-minute focus sprints with breaks.",
+    href: "/tools/pomodoro",
   },
 ];
 
