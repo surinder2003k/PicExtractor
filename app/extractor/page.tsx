@@ -13,6 +13,8 @@ import {
   Loader2,
   Info,
   Trash2,
+  LayoutGrid,
+  Search,
 } from "lucide-react";
 import { Dropzone, SelectedFileBadge, validationMessage } from "@/components/dropzone";
 import { FrameCard } from "@/components/frame-card";
@@ -27,6 +29,7 @@ import {
   timeToSeconds,
 } from "@/lib/video";
 import { copyFrameToClipboard, downloadFramesZip, downloadSingleFrame } from "@/lib/zip";
+import { buildContactSheet, estimateFramesSize, formatBytes } from "@/lib/contact-sheet";
 import type { ExtractedFrame, FrameFormat } from "@/lib/types";
 
 const FORMATS: { value: FrameFormat; label: string }[] = [
@@ -41,21 +44,27 @@ interface SavedSettings {
   intervalMs: number;
   format: FrameFormat;
   quality: number;
+  prefix?: string;
+  gridCols?: number;
 }
 
+const DEFAULT_SETTINGS = { intervalMs: 500, format: "jpeg" as FrameFormat, quality: 85, prefix: "", gridCols: 4 };
+
 function loadSettings(): SavedSettings {
-  if (typeof window === "undefined") return { intervalMs: 500, format: "jpeg", quality: 85 };
+  if (typeof window === "undefined") return { ...DEFAULT_SETTINGS };
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return { intervalMs: 500, format: "jpeg", quality: 85 };
+    if (!raw) return { ...DEFAULT_SETTINGS };
     const parsed = JSON.parse(raw) as Partial<SavedSettings>;
     return {
-      intervalMs: typeof parsed.intervalMs === "number" ? parsed.intervalMs : 500,
-      format: (FORMATS.some((f) => f.value === parsed.format) ? parsed.format : "jpeg") as FrameFormat,
-      quality: typeof parsed.quality === "number" ? parsed.quality : 85,
+      intervalMs: typeof parsed.intervalMs === "number" ? parsed.intervalMs : DEFAULT_SETTINGS.intervalMs,
+      format: (FORMATS.some((f) => f.value === parsed.format) ? parsed.format : DEFAULT_SETTINGS.format) as FrameFormat,
+      quality: typeof parsed.quality === "number" ? parsed.quality : DEFAULT_SETTINGS.quality,
+      prefix: typeof parsed.prefix === "string" ? parsed.prefix : "",
+      gridCols: typeof parsed.gridCols === "number" ? parsed.gridCols : DEFAULT_SETTINGS.gridCols,
     };
   } catch {
-    return { intervalMs: 500, format: "jpeg", quality: 85 };
+    return { ...DEFAULT_SETTINGS };
   }
 }
 
@@ -79,6 +88,10 @@ export default function Extractor() {
   const [intervalMs, setIntervalMs] = useState(loadSettings().intervalMs);
   const [format, setFormat] = useState<FrameFormat>(loadSettings().format);
   const [quality, setQuality] = useState(loadSettings().quality);
+  const [prefix, setPrefix] = useState<string>(loadSettings().prefix ?? "");
+  const [gridCols, setGridCols] = useState<number>(loadSettings().gridCols ?? DEFAULT_SETTINGS.gridCols);
+  const [frameFilter, setFrameFilter] = useState("");
+  const [sheetBusy, setSheetBusy] = useState(false);
   const [startStr, setStartStr] = useState("00:00:00.000");
   const [endStr, setEndStr] = useState("");
 
@@ -298,6 +311,25 @@ export default function Extractor() {
   const selectNone = () => setSelected(new Set());
   const selectedCount = selected.size;
 
+  // Filename base: a user-supplied prefix wins over the video name.
+  const baseName = prefix.trim() || file?.name || "video";
+
+  // Frames filtered by the search box (matches timestamp / frame #).
+  const visibleFrames = useMemo(() => {
+    const q = frameFilter.trim().toLowerCase();
+    if (!q) return frames;
+    return frames.filter((f) => {
+      const idStr = `#${String(f.id + 1).padStart(5, "0")}`;
+      return (
+        f.formattedTime.toLowerCase().includes(q) ||
+        f.timestamp.toFixed(3).includes(q.replace(/:/g, ".")) ||
+        idStr.toLowerCase().includes(q.replace("#", ""))
+      );
+    });
+  }, [frames, frameFilter]);
+
+  const selectedFramesSize = useMemo(() => estimateFramesSize(frames.filter((f) => selected.has(f.id))), [frames, selected]);
+
   const handleZip = async () => {
     const chosen = frames.filter((f) => selected.has(f.id));
     if (chosen.length === 0) {
@@ -307,13 +339,47 @@ export default function Extractor() {
     setZipping(true);
     setZipProgress(0);
     try {
-      await downloadFramesZip(chosen, file?.name ?? "frames", setZipProgress);
+      await downloadFramesZip(chosen, baseName, setZipProgress);
       toast.success(`Downloaded ${chosen.length} frame${chosen.length > 1 ? "s" : ""} as ZIP.`);
     } catch {
       toast.error("Failed to create ZIP.");
     } finally {
       setZipping(false);
     }
+  };
+
+  const handleContactSheet = async () => {
+    const chosen = frames.filter((f) => selected.has(f.id));
+    if (chosen.length === 0) {
+      toast.error("Select at least one frame to build a contact sheet.");
+      return;
+    }
+    setSheetBusy(true);
+    try {
+      const sheet = await buildContactSheet(chosen, { columns: gridCols });
+      if (!sheet) {
+        toast.error("Could not build the contact sheet.");
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = sheet.dataUrl;
+      a.download = `${baseName.replace(/\\.[^.]+$/, "") || "contact-sheet"}-contact-sheet.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast.success(`Contact sheet saved (${chosen.length} frames, ${sheet.width}×${sheet.height}).`);
+    } catch {
+      toast.error("Failed to build the contact sheet.");
+    } finally {
+      setSheetBusy(false);
+    }
+  };
+
+  const toggleVideoPlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) video.play();
+    else video.pause();
   };
 
   const openContextMenu = (e: React.MouseEvent, frame: ExtractedFrame) => {
@@ -323,11 +389,30 @@ export default function Extractor() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ intervalMs, format, quality }));
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ intervalMs, format, quality, prefix, gridCols }));
     } catch {
       // ignore storage failures (private mode etc.)
     }
-  }, [intervalMs, format, quality]);
+  }, [intervalMs, format, quality, prefix, gridCols]);
+
+  // Global keyboard shortcuts: Space = play/pause, C = capture current frame,
+  // [ / ] select previous/next frame.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      // Ignore when typing into a text field / textarea / select.
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT")) return;
+      if (!videoRef.current || extracting) return;
+      if (e.key === " ") {
+        e.preventDefault();
+        toggleVideoPlay();
+      } else if (e.key.toLowerCase() === "c") {
+        handleCapture();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [extracting, toggleVideoPlay, handleCapture]);
 
   useEffect(() => {
     const close = () => setContextMenu(null);
@@ -383,6 +468,13 @@ export default function Extractor() {
                   <p className="text-muted-foreground">Resolution</p>
                   <p className="font-medium">
                     {videoWidth} × {videoHeight}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">File</p>
+                  <p className="font-medium">
+                    {file?.name ?? ""}
+                    <span className="text-muted-foreground"> · {file ? formatBytes(file.size) : ""}</span>
                   </p>
                 </div>
                 <div>
@@ -476,6 +568,19 @@ export default function Extractor() {
                     />
                   </div>
                 </div>
+                <div className="pt-1">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-muted-foreground">File Name Prefix</span>
+                    <span className="font-medium">{prefix.trim() ? `…_${prefix}${prefix ? "_" : ""}frame-00001.${format}` : "use video name"}</span>
+                  </div>
+                  <input
+                    value={prefix}
+                    onChange={(e) => setPrefix(e.target.value)}
+                    placeholder="Optional custom prefix (e.g. project-a)"
+                    aria-label="File name prefix"
+                    className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-xs outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -527,7 +632,13 @@ export default function Extractor() {
                 preload="metadata"
                 className="w-full rounded-lg bg-black"
                 aria-label="Video preview player"
+                onDoubleClick={handleCapture}
+                title="Double-click to capture this frame"
               />
+              <p className="mt-2 text-xs text-muted-foreground">
+                Shortcuts: <kbd className="rounded border border-border px-1.5">Space</kbd> play/pause ·{" "}
+                <kbd className="rounded border border-border px-1.5">C</kbd> capture frame · double-click video to capture
+              </p>
             </div>
           )}
 
@@ -563,11 +674,40 @@ export default function Extractor() {
           {frames.length > 0 && (
             <div className="rounded-xl border border-border bg-card p-6">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <h3 className="font-semibold">Frames ({frames.length})</h3>
+                <h3 className="font-semibold">
+                  Frames ({visibleFrames.length}
+                  {frameFilter.trim() ? ` / ${frames.length}` : ""})
+                </h3>
                 <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      value={frameFilter}
+                      onChange={(e) => setFrameFilter(e.target.value)}
+                      placeholder="Filter by time or #"
+                      aria-label="Filter frames"
+                      className="w-40 rounded-md border border-input bg-background py-1 pl-7 pr-2 text-xs outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
                   <span className="text-muted-foreground">
                     {selectedCount} of {frames.length} selected
+                    {selectedCount > 0 ? ` (~${formatBytes(selectedFramesSize)})` : ""}
                   </span>
+                  <label className="flex items-center gap-1.5 text-muted-foreground">
+                    Grid
+                    <select
+                      value={gridCols}
+                      onChange={(e) => setGridCols(Number(e.target.value))}
+                      aria-label="Grid columns"
+                      className="rounded-md border border-border bg-card px-1.5 py-1 text-xs outline-none"
+                    >
+                      {[2, 3, 4, 5, 6, 8].map((n) => (
+                        <option key={n} value={n}>
+                          {n} cols
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <button
                     type="button"
                     onClick={selectAll}
@@ -584,6 +724,16 @@ export default function Extractor() {
                   </button>
                   <button
                     type="button"
+                    onClick={handleContactSheet}
+                    disabled={sheetBusy || selectedCount === 0}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-primary/50 bg-primary/10 px-3 py-1 font-medium text-primary transition-colors hover:bg-primary/20 disabled:opacity-50"
+                    title="Merge selected frames into one grid image"
+                  >
+                    {sheetBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LayoutGrid className="h-3.5 w-3.5" />}
+                    {sheetBusy ? "Building…" : "Contact Sheet"}
+                  </button>
+                  <button
+                    type="button"
                     onClick={handleZip}
                     disabled={zipping || selectedCount === 0}
                     className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1 font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
@@ -593,8 +743,8 @@ export default function Extractor() {
                   </button>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                {frames.map((frame) => (
+              <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
+                {visibleFrames.map((frame) => (
                   <FrameCard
                     key={frame.id}
                     frame={frame}
@@ -602,7 +752,7 @@ export default function Extractor() {
                     onToggle={() => toggleFrame(frame.id)}
                     onOpen={() => openViewer(frame)}
                     onDownload={() => {
-                      downloadSingleFrame(frame, file?.name ?? "video");
+                      downloadSingleFrame(frame, baseName);
                       toast.success("Frame downloaded.");
                     }}
                     onCopy={async () => {
@@ -637,7 +787,7 @@ export default function Extractor() {
           onPrev={() => stepViewer(-1)}
           onNext={() => stepViewer(1)}
           onDownload={(frame) => {
-            downloadSingleFrame(frame, file?.name ?? "video");
+            downloadSingleFrame(frame, baseName);
             toast.success("Frame downloaded.");
           }}
           onCopy={async (frame) => {
@@ -674,7 +824,7 @@ export default function Extractor() {
             type="button"
             className="block w-full px-4 py-2 text-left text-sm transition-colors hover:bg-secondary"
             onClick={() => {
-              downloadSingleFrame(contextMenu.frame, file?.name ?? "video");
+              downloadSingleFrame(contextMenu.frame, baseName);
               setContextMenu(null);
             }}
           >
