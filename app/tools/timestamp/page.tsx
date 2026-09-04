@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { ArrowDownUp, Copy } from "lucide-react";
+import { ArrowDownUp, Clock, Copy, RefreshCcw } from "lucide-react";
 import { timestampToDate, dateToTimestamp } from "@/lib/tools/time";
 
 type Dir = "toDate" | "toTimestamp";
@@ -51,6 +51,22 @@ export default function TimestampPage() {
       >
         <ArrowDownUp className="h-4 w-4" />
         {mode === "toDate" ? "Timestamp → Date" : "Date → Timestamp"}
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          setInput(mode === "toDate" ? String(Math.floor(Date.now() / 1000)) : new Date().toISOString())
+        }
+        className="mt-6 ml-2 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary"
+      >
+        <Clock className="h-4 w-4" /> Now
+      </button>
+      <button
+        type="button"
+        onClick={() => setInput("")}
+        className="mt-6 ml-2 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary"
+      >
+        <RefreshCcw className="h-4 w-4" /> Clear
       </button>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">

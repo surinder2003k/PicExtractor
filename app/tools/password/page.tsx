@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Copy, RefreshCcw, KeyRound } from "lucide-react";
 import { generatePassword, estimateStrength } from "@/lib/tools/password";
@@ -15,6 +15,12 @@ export default function PasswordPage() {
   const generate = () => {
     setPassword(generatePassword({ length, symbols, excludeAmbiguous }));
   };
+
+  // Generate one immediately so the page never opens empty.
+  useEffect(() => {
+    generate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCopy = async () => {
     try {

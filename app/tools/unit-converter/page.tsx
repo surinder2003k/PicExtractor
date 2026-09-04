@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
+import { ArrowDownUp, Copy } from "lucide-react";
 import { UNIT_GROUPS, convertUnit, convertTemperature, type UnitGroup } from "@/lib/tools/units";
 
 export default function UnitConverterPage() {
@@ -31,7 +33,7 @@ export default function UnitConverterPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <h1 className="text-3xl font-bold">Unit Converter</h1>
-      <p className="mt-2 text-muted-foreground">Convert length, weight, temperature,and data size.</p>
+      <p className="mt-2 text-muted-foreground">Convert length, weight, temperature, and data size.</p>
 
       <div className="mt-6 flex flex-wrap gap-2">
         {[...UNIT_GROUPS, { id: "temperature", label: "Temperature", units: [] }].map((g) => (
@@ -71,6 +73,19 @@ export default function UnitConverterPage() {
             </select>
           </div>
 
+          <button
+            type="button"
+            onClick={() => {
+              const f = from;
+              setFrom(to);
+              setTo(f);
+            }}
+            title="Swap units"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border transition-colors hover:bg-secondary"
+          >
+            <ArrowDownUp className="h-4 w-4" />
+          </button>
+
           <div className="min-w-32">
             <label className="mb-1 block text-xs text-muted-foreground">To</label>
             <select value={to} onChange={(e) => setTo(e.target.value)} className="w-full rounded-md border border-border bg-background p-3 text-sm outline-none">
@@ -82,7 +97,23 @@ export default function UnitConverterPage() {
         </div>
 
         <div className="mt-6 rounded-lg border border-border bg-muted p-5 text-center">
-          <span className="text-xs text-muted-foreground">Result</span>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-xs text-muted-foreground">Result</span>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(`${value} ${from} = ${format(result as number | null)} ${to}`);
+                  toast.success("Copied.");
+                } catch {
+                  toast.error("Could not copy.");
+                }
+              }}
+              className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-xs transition-colors hover:bg-secondary"
+            >
+              <Copy className="h-3 w-3" /> Copy
+            </button>
+          </div>
           <p className="text-3xl font-bold">
             {from} → {to}: {format(result as number | null)}
           </p>

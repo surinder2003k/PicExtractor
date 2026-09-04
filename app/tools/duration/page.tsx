@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
+import { Copy } from "lucide-react";
 import { computePeriod } from "@/lib/tools/period";
 
 export default function DurationPage() {
@@ -56,6 +58,24 @@ export default function DurationPage() {
               <p className="text-center text-sm text-muted-foreground">
                 ~ <strong className="text-foreground">{result.breakdown}</strong>
               </p>
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        `${start} → ${end || "today"}: ${result.totalDays} days (${result.breakdown})`
+                      );
+                      toast.success("Copied.");
+                    } catch {
+                      toast.error("Could not copy.");
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs transition-colors hover:bg-secondary"
+                >
+                  <Copy className="h-3.5 w-3.5" /> Copy result
+                </button>
+              </div>
             </div>
           ) : (
             <p className="mt-6 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-center text-sm text-destructive">
