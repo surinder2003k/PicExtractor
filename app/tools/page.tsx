@@ -61,6 +61,10 @@ import {
   Wallet,
   Network,
   Lightbulb,
+  Sparkles,
+  Columns3,
+  FileOutput,
+  Tag,
 } from "lucide-react";
 
 const tools = [
@@ -459,6 +463,36 @@ const tools = [
     title: "Random Advice",
     description: "A nugget of wisdom on demand.",
     href: "/tools/advice",
+  },
+  {
+    icon: Sparkles,
+    title: "Box Shadow Generator",
+    description: "Tune sliders, copy production CSS.",
+    href: "/tools/shadows",
+  },
+  {
+    icon: Columns3,
+    title: "Mini Kanban",
+    description: "Three-column task board on your device.",
+    href: "/tools/kanban",
+  },
+  {
+    icon: FileOutput,
+    title: "Text → PDF",
+    description: "Clean printable PDFs from plain text.",
+    href: "/tools/text-pdf",
+  },
+  {
+    icon: Tag,
+    title: "Discount Calculator",
+    description: "Stacked coupons, real final price.",
+    href: "/tools/discount",
+  },
+  {
+    icon: Braces,
+    title: "Regex Tester",
+    description: "Live match highlighting and match list.",
+    href: "/tools/regex",
   },
 ];
 
