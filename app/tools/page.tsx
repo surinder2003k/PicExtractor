@@ -39,6 +39,10 @@ import {
   Utensils,
   FileText,
   CalendarCheck,
+  Pipette,
+  SpellCheck,
+  Eraser,
+  Keyboard,
 } from "lucide-react";
 
 const tools = [
@@ -287,6 +291,36 @@ const tools = [
     title: "Habit Tracker",
     description: "Weekly habit grid, saved in your browser.",
     href: "/tools/habits",
+  },
+  {
+    icon: Timer,
+    title: "Stopwatch",
+    description: "Precision stopwatch with laps for tasks and workouts.",
+    href: "/tools/stopwatch",
+  },
+  {
+    icon: Pipette,
+    title: "Palette Extractor",
+    description: "Pull dominant HEX colors from any image.",
+    href: "/tools/palette",
+  },
+  {
+    icon: SpellCheck,
+    title: "Number to Words",
+    description: "Amounts in words (lakh/crore) for cheques.",
+    href: "/tools/number-to-words",
+  },
+  {
+    icon: Eraser,
+    title: "Text Cleaner",
+    description: "13 one-click fixes: trim, dedupe, sort, escape.",
+    href: "/tools/text-cleaner",
+  },
+  {
+    icon: Keyboard,
+    title: "Typing Speed Test",
+    description: "Measure your WPM and accuracy live.",
+    href: "/tools/typing",
   },
 ];
 
