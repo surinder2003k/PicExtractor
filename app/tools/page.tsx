@@ -1,5 +1,9 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
+  Award,
   FileSpreadsheet,
   Braces,
   Image as ImageIcon,
@@ -75,7 +79,41 @@ import {
   PiggyBank,
   GraduationCap,
   Scissors,
+  Search,
+  LayoutGrid,
 } from "lucide-react";
+
+const CATS = ["All", "Developer", "Design", "Text", "Calculators", "Money", "Time", "Utilities", "Live"] as const;
+
+const catOf: Record<string, string> = {
+  "/tools/csv-json": "Developer", "/tools/json-formatter": "Developer", "/tools/json-to-ts": "Developer",
+  "/tools/base64": "Developer", "/tools/hash": "Developer", "/tools/uuid": "Developer",
+  "/tools/jwt": "Developer", "/tools/regex": "Developer", "/tools/url-encode": "Developer",
+  "/tools/number-base": "Developer", "/tools/text-diff": "Developer", "/tools/subnet": "Developer",
+  "/tools/my-ip": "Developer", "/tools/csv-cleaner": "Developer", "/tools/markdown-table": "Developer",
+  "/tools/image-converter": "Design", "/tools/image-compressor": "Design", "/tools/qr-code": "Design",
+  "/tools/placeholder": "Design", "/tools/color": "Design", "/tools/contrast": "Design",
+  "/tools/shadows": "Design", "/tools/border-radius": "Design", "/tools/gradient": "Design",
+  "/tools/gradient-text": "Design", "/tools/palette": "Design",
+  "/tools/case-converter": "Text", "/tools/word-count": "Text", "/tools/word-frequency": "Text",
+  "/tools/lorem": "Text", "/tools/titles": "Text", "/tools/text-cleaner": "Text",
+  "/tools/markdown-preview": "Text", "/tools/emoji": "Text", "/tools/morse": "Text",
+  "/tools/caesar": "Text", "/tools/number-to-words": "Text",
+  "/tools/timestamp": "Time", "/tools/date-math": "Time", "/tools/duration": "Time",
+  "/tools/age": "Time", "/tools/holidays": "Time", "/tools/countdown": "Time",
+  "/tools/stopwatch": "Time", "/tools/pomodoro": "Time", "/tools/timesheet": "Time", "/tools/metronome": "Time",
+  "/tools/currency": "Money", "/tools/gst": "Money", "/tools/discount": "Money", "/tools/emi": "Money",
+  "/tools/interest": "Money", "/tools/invoice": "Money", "/tools/bills": "Money",
+  "/tools/savings": "Money", "/tools/tip-splitter": "Money",
+  "/tools/unit-converter": "Calculators", "/tools/aspect-ratio": "Calculators", "/tools/fractions": "Calculators",
+  "/tools/percentage": "Calculators", "/tools/marks": "Calculators", "/tools/cgpa": "Calculators",
+  "/tools/roman": "Calculators", "/tools/bmi": "Calculators", "/tools/ideal-weight": "Calculators",
+  "/tools/password": "Utilities", "/tools/strength": "Utilities", "/tools/typing": "Utilities",
+  "/tools/memory": "Utilities", "/tools/randomizer": "Utilities", "/tools/team-picker": "Utilities",
+  "/tools/chart": "Utilities", "/tools/kanban": "Utilities", "/tools/resume": "Utilities",
+  "/tools/text-pdf": "Utilities", "/tools/url-cleaner": "Utilities", "/tools/habits": "Utilities",
+  "/tools/weather": "Live", "/tools/country": "Live", "/tools/dictionary": "Live", "/tools/advice": "Live",
+};
 
 const tools = [
   {
@@ -293,6 +331,12 @@ const tools = [
     title: "Randomizer",
     description: "Lucky numbers, coin flips, and dice rolls.",
     href: "/tools/randomizer",
+  },
+  {
+    icon: GraduationCap,
+    title: "CGPA Calculator",
+    description: "Add SGPA per semester → credit-weighted CGPA instantly.",
+    href: "/tools/cgpa",
   },
   {
     icon: FileArchive,
@@ -564,31 +608,102 @@ const tools = [
     description: "Strip utm/gclid/fbclid tracking params.",
     href: "/tools/url-cleaner",
   },
+  {
+    icon: Award,
+    title: "CGPA Calculator",
+    description: "SGPA + credits → credit-weighted CGPA.",
+    href: "/tools/cgpa",
+  },
 ];
 
 export default function ToolsPage() {
+  const [query, setQuery] = useState("");
+  const [cat, setCat] = useState<(typeof CATS)[number]>("All");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return tools.filter((t) => {
+      if (cat !== "All" && catOf[t.href] !== cat) return false;
+      if (!q) return true;
+      return (
+        t.title.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q)
+      );
+    });
+  }, [query, cat]);
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="text-4xl font-bold tracking-tight">Business Toolkit</h1>
-      <p className="mt-3 max-w-2xl text-muted-foreground">
-        Free productivity tools that run entirely in your browser. No uploads, no server, no sign-in.
-      </p>
+      <div className="mx-auto max-w-2xl text-center">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+          {tools.length} tools · free forever · no sign-up
+        </span>
+        <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+          The whole{" "}
+          <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+            toolbox
+          </span>
+          , one page
+        </h1>
+        <p className="mt-3 text-muted-foreground">
+          Everything runs in your browser. Pick a category or search for what you need.
+        </p>
+      </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="sticky top-14 z-30 -mx-4 mt-8 bg-background/85 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 shadow-sm">
+            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`Search ${tools.length} tools… (e.g. qr, emi, json)`}
+              className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none"
+            />
+          </div>
+          <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {CATS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCat(c)}
+                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                  cat === c
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
+                }`}
+              >
+                {c === "All" ? "◈ All" : c}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="mt-16 text-center text-muted-foreground">
+          Nothing matched &ldquo;{query}&rdquo;. Try another word?
+        </p>
+      ) : (
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {tools.map((tool) => (
           <Link
             key={tool.href}
             href={tool.href}
-            className="group rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/60"
+            className="group rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
           >
-            <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
               <tool.icon className="h-5 w-5" />
             </div>
-            <h3 className="font-semibold">{tool.title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{tool.description}</p>
+            <h3 className="font-semibold leading-snug">{tool.title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{tool.description}</p>
+            <span className="mt-3 inline-block text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+              Open →
+            </span>
           </Link>
         ))}
       </div>
+      )}
     </div>
   );
 }

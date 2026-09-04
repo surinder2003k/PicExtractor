@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --radius: 0.75rem;
   --background: hsl(0 0% 100%);
   --foreground: hsl(240 10% 3.9%);
   --card: hsl(0 0% 100%);
@@ -81,9 +82,23 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(50rem 25rem at 85% -5%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 70%),
+    radial-gradient(40rem 20rem at 0% 100%, color-mix(in oklab, var(--primary) 5%, transparent), transparent 70%),
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 ::-webkit-scrollbar {

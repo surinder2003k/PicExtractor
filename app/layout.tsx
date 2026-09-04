@@ -62,12 +62,15 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Link href="/" className="flex items-center gap-2.5 font-semibold">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-blue-500 text-primary-foreground shadow-sm">
                 <Clapperboard className="h-4 w-4" />
               </span>
-              <span>
-                PicExtractor <span className="hidden text-muted-foreground sm:inline">· Video Screenshot Extractor</span>
+              <span className="flex flex-col leading-none">
+                PicExtractor
+                <span className="mt-0.5 hidden text-[10px] font-normal tracking-wide text-muted-foreground sm:inline">
+                  tools that stay on your device
+                </span>
               </span>
             </Link>
             <div className="flex items-center gap-2">
@@ -79,15 +82,15 @@ export default function RootLayout({
               </Link>
               <Link
                 href="/tools"
-                className="inline-flex h-9 items-center rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="inline-flex h-9 items-center rounded-lg border border-border bg-card px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               >
                 Tools
               </Link>
               <Link
                 href="/extractor"
-                className="inline-flex h-9 items-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                className="inline-flex h-9 items-center rounded-lg bg-gradient-to-r from-primary to-blue-500 px-4 text-sm font-medium text-primary-foreground shadow-sm transition-shadow hover:shadow-md"
               >
-                Open Extractor
+                Extract Video
               </Link>
               <ThemeToggle />
             </div>
