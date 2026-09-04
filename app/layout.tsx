@@ -79,11 +79,7 @@ export default function RootLayout({
             </Link>
             <div className="flex items-center gap-2">
               <GlobalSearch />
-              <MobileNav>
-                <Link href="/cheatsheets" className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground" onClick={() => {}}>Cheat Sheets</Link>
-                <Link href="/tools" className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground" onClick={() => {}}>All Tools</Link>
-                <Link href="/extractor" className="block rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-secondary" onClick={() => {}}>Extract Video</Link>
-              </MobileNav>
+              <MobileNav />
               <Link
                 href="/cheatsheets"
                 className="hidden h-9 items-center rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:inline-flex"

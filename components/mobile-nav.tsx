@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
-export default function MobileNav({ children }: { children: React.ReactNode }) {
+export default function MobileNav() {
   const [open, setOpen] = useState(false);
 
   return (
@@ -34,7 +34,9 @@ export default function MobileNav({ children }: { children: React.ReactNode }) {
               </button>
             </div>
             <nav className="mt-6 space-y-1">
-              {children}
+              <Link href="/cheatsheets" className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">Cheat Sheets</Link>
+              <Link href="/tools" className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">All Tools</Link>
+              <Link href="/extractor" className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">Frame Extractor</Link>
             </nav>
           </div>
         </div>
