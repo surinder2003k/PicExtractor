@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Copy, RefreshCcw, CheckCircle2, AlertCircle } from "lucide-react";
+import { Copy, RefreshCcw, CheckCircle2, AlertCircle, Download } from "lucide-react";
 import { formatJson, minifyJson, jsonStats } from "@/lib/tools/json";
 
 type Action = "format" | "minify";
+
+const SAMPLE_JSON = '{"app":"PicExtractor","version":"1.0.0","tools":["csv","json"],"active":true,"config":{"theme":"dark","limit":100},"tags":["fast","private","free"]}';
 
 export default function JsonFormatterPage() {
   const [input, setInput] = useState("");
@@ -33,6 +35,17 @@ export default function JsonFormatterPage() {
     }
   };
 
+  const handleDownload = () => {
+    if (!result.text || !result.ok) return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([result.text], { type: "application/json" }));
+    a.download = action === "format" ? "formatted.json" : "minified.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <h1 className="text-3xl font-bold">JSON Formatter</h1>
@@ -52,6 +65,21 @@ export default function JsonFormatterPage() {
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setInput(SAMPLE_JSON)}
+            className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs transition-colors hover:bg-secondary"
+          >
+            Sample
+          </button>
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={isEmpty || !result.ok}
+            className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs transition-colors hover:bg-secondary disabled:opacity-50"
+          >
+            <Download className="h-3.5 w-3.5" /> Download
+          </button>
           <button
             type="button"
             onClick={handleCopy}

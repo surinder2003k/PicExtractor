@@ -3,6 +3,12 @@
 import { useMemo, useState } from "react";
 import { countStats } from "@/lib/tools/text";
 
+const SAMPLE_TEXT =
+  "PicExtractor is a free, private, browser-based toolkit. " +
+  "No uploads. No accounts. No waiting.\n\n" +
+  "Everything runs locally on your machine, so your files never leave your laptop. " +
+  "Try it with any video, any size — frames appear in seconds.";
+
 export default function WordCountPage() {
   const [text, setText] = useState("");
   const stats = useMemo(function () { return countStats(text); }, [text]);
@@ -21,6 +27,23 @@ export default function WordCountPage() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <h1 className="text-3xl font-bold">Word &amp; Character Counter</h1>
       <p className="mt-2 text-muted-foreground">Live stats for any text.</p>
+
+      <div className="mt-6 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setText(SAMPLE_TEXT)}
+          className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs transition-colors hover:bg-secondary"
+        >
+          Sample
+        </button>
+        <button
+          type="button"
+          onClick={() => setText("")}
+          className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs transition-colors hover:bg-secondary"
+        >
+          Clear
+        </button>
+      </div>
 
       <textarea
         value={text}

@@ -18,6 +18,10 @@ const MODES: CaseMode[] = [
   "constant",
 ];
 
+const SAMPLE_TEXT =
+  "The quick brown fox jumps over the lazy dog. " +
+  "Pack my box with five dozen liquor jugs!";
+
 export default function CaseConverterPage() {
   const [text, setText] = useState("");
   const [copied, setCopied] = useState(false);
@@ -43,6 +47,23 @@ export default function CaseConverterPage() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <h1 className="text-3xl font-bold">Case Converter</h1>
       <p className="mt-2 text-muted-foreground">Convert text to any casing in one click.</p>
+
+      <div className="mt-6 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setText(SAMPLE_TEXT)}
+          className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs transition-colors hover:bg-secondary"
+        >
+          Sample
+        </button>
+        <button
+          type="button"
+          onClick={() => setText("")}
+          className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs transition-colors hover:bg-secondary"
+        >
+          Clear
+        </button>
+      </div>
 
       <textarea
         value={text}

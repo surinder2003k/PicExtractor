@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ArrowDownUp, Copy, RefreshCcw } from "lucide-react";
+import { ArrowDownUp, Copy, Download, RefreshCcw } from "lucide-react";
 import { csvToJson, jsonToCsv } from "@/lib/tools/csv";
 
 type Dir = "csv2json" | "json2csv";
@@ -27,9 +27,28 @@ export default function CsvJsonPage() {
     }
   };
 
+  const handleDownload = () => {
+    if (!output) return;
+    const ext = mode === "csv2json" ? "json" : "csv";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([output], { type: "application/octet-stream" }));
+    a.download = `converted.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  };
+
+  const SAMPLE_CSV = "name,age,dept\n"+ "Alice,30,Eng\n" + "Bob,25,Sales\n" + "Carol,41,Design";
+  const SAMPLE_JSON = '[{"name":"Alice","age":30,"dept":"Eng"},{"name":"Bob","age":25,"dept":"Sales"},{"name":"Carol","age":41,"dept":"Design"}]';
+
+  const loadSample = () => {
+    setInput(mode === "csv2json" ? SAMPLE_CSV : SAMPLE_JSON);
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-bold">CSV ⇥ JSON Converter</h1>
+      <h1 className="text-3xl font-bold">CSV ⇄ JSON Converter</h1>
       <p className="mt-2 text-muted-foreground">Convert between CSV and JSON right in your browser.</p>
 
       <button
@@ -65,6 +84,21 @@ export default function CsvJsonPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                onClick={loadSample}
+                className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs transition-colors hover:bg-secondary"
+              >
+                Sample
+              </button>
+              <button
+                type="button"
+                onClick={handleDownload}
+                disabled={!output}
+                className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs transition-colors hover:bg-secondary disabled:opacity-50"
+              >
+                <Download className="h-3.5 w-3.5" /> Download
+              </button>
+              <button
+                type="button"
                 onClick={handleCopy}
                 disabled={!output}
                 className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs transition-colors hover:bg-secondary disabled:opacity-50"
@@ -80,7 +114,7 @@ export default function CsvJsonPage() {
               </button>
             </div>
           </div>
-          <pre className="h-72 overflow-auto rounded-md border border-border bg-muted p-3 text-xs">{output || "Result sẽ appear here…"}</pre>
+          <pre className="h-72 overflow-auto rounded-md border border-border bg-muted p-3 text-xs">{output || "Result will appear here..."}</pre>
         </div>
       </div>
     </div>
