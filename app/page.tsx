@@ -17,7 +17,10 @@ import {
   Package,
   GraduationCap,
   Heart,
+  Star,
 } from "lucide-react";
+import { AnimatedCounter } from "@/components/animated-counter";
+import FavoritesGrid from "@/components/favorites-grid";
 
 const stats = [
   { value: "83+", label: "Free tools" },
@@ -178,7 +181,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-8 text-center sm:grid-cols-4 sm:gap-6 sm:px-6 sm:py-12">
           {stats.map((s) => (
             <div key={s.label} className="rounded-xl border border-border/60 bg-background/50 p-4">
-              <p className="text-2xl font-bold text-primary sm:text-3xl">{s.value}</p>
+              <p className="text-2xl font-bold text-primary sm:text-3xl"><AnimatedCounter value={s.value} /></p>
               <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">{s.label}</p>
             </div>
           ))}
@@ -206,6 +209,22 @@ export default function Home() {
         </div>
       </section>
 
+      {/* YOUR FAVORITES */}
+      <section className="border-b border-border/60 bg-card/30">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+          <h2 className="text-center text-2xl font-bold tracking-tight sm:text-3xl">
+            <Star className="mr-2 inline h-6 w-6 text-yellow-500" /> Your Favorites
+          </h2>
+          <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted-foreground">
+            Star any tool and it shows up here. Saved on your device — no account needed.
+          </p>
+          <div className="mt-8">
+            <FavoritesGrid />
+          </div>
+        </div>
+      </section>
+
+      {/* THREE WORLDS */}
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="text-center">

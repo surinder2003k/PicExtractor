@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Award,
@@ -81,6 +81,7 @@ import {
   Scissors,
   Search,
   LayoutGrid,
+  Clock4,
 } from "lucide-react";
 
 const CATS = ["All", "Developer", "Design", "Text", "Calculators", "Money", "Time", "Utilities", "Live"] as const;

@@ -6,7 +6,9 @@ import { Clapperboard } from "lucide-react";
 import "./globals.css";
 import { ThemeToggle } from "@/components/theme-toggle";
 import GlobalSearch from "@/components/global-search";
+import MobileNav from "@/components/mobile-nav";
 import BackToTop from "@/components/back-to-top";
+import ShortcutsHelp from "@/components/shortcuts-help";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -77,6 +79,11 @@ export default function RootLayout({
             </Link>
             <div className="flex items-center gap-2">
               <GlobalSearch />
+              <MobileNav>
+                <Link href="/cheatsheets" className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground" onClick={() => {}}>Cheat Sheets</Link>
+                <Link href="/tools" className="block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground" onClick={() => {}}>All Tools</Link>
+                <Link href="/extractor" className="block rounded-lg px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-secondary" onClick={() => {}}>Extract Video</Link>
+              </MobileNav>
               <Link
                 href="/cheatsheets"
                 className="hidden h-9 items-center rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:inline-flex"
@@ -101,6 +108,7 @@ export default function RootLayout({
         </header>
         <main className="flex-1">{children}</main>
         <BackToTop />
+        <ShortcutsHelp />
         <footer className="border-t border-border/60">
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-10 sm:grid-cols-4 sm:px-6">
             <div className="col-span-2 sm:col-span-1">
