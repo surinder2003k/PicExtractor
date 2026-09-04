@@ -5,6 +5,8 @@ import { Toaster } from "sonner";
 import { Clapperboard } from "lucide-react";
 import "./globals.css";
 import { ThemeToggle } from "@/components/theme-toggle";
+import GlobalSearch from "@/components/global-search";
+import BackToTop from "@/components/back-to-top";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,9 +76,10 @@ export default function RootLayout({
               </span>
             </Link>
             <div className="flex items-center gap-2">
+              <GlobalSearch />
               <Link
                 href="/cheatsheets"
-                className="hidden h-9 items-center rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:inline-flex"
+                className="hidden h-9 items-center rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground md:inline-flex"
               >
                 Cheat Sheets
               </Link>
@@ -97,6 +100,7 @@ export default function RootLayout({
           </div>
         </header>
         <main className="flex-1">{children}</main>
+        <BackToTop />
         <footer className="border-t border-border/60">
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-10 sm:grid-cols-4 sm:px-6">
             <div className="col-span-2 sm:col-span-1">
