@@ -70,6 +70,11 @@ import {
   Sigma,
   CalendarClock,
   Smile,
+  Circle,
+  Languages,
+  PiggyBank,
+  GraduationCap,
+  Scissors,
 } from "lucide-react";
 
 const tools = [
@@ -528,6 +533,36 @@ const tools = [
     title: "Emoji Copier",
     description: "Click-to-copy emoji for chats and docs.",
     href: "/tools/emoji",
+  },
+  {
+    icon: Circle,
+    title: "Border Radius",
+    description: "Per-corner rounding with live preview.",
+    href: "/tools/border-radius",
+  },
+  {
+    icon: Languages,
+    title: "Caesar Cipher",
+    description: "Shift encode, decode, and auto-crack.",
+    href: "/tools/caesar",
+  },
+  {
+    icon: PiggyBank,
+    title: "Savings Goal",
+    description: "Track progress and ETA to your target.",
+    href: "/tools/savings",
+  },
+  {
+    icon: GraduationCap,
+    title: "Marks Percentage",
+    description: "Marks to %, grade, and approx CGPA.",
+    href: "/tools/marks",
+  },
+  {
+    icon: Scissors,
+    title: "URL Cleaner",
+    description: "Strip utm/gclid/fbclid tracking params.",
+    href: "/tools/url-cleaner",
   },
 ];
 
