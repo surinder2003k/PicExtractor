@@ -165,7 +165,7 @@ const tools = [
   {
     icon: QrCode,
     title: "QR Code Generator",
-    description: "Turn links or text into downloadable QR codes.",
+    description: "Classic, dots, or 3D tree styled QR codes.",
     href: "/tools/qr-code",
   },
   {
