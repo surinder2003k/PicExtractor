@@ -92,14 +92,14 @@ const catOf: Record<string, string> = {
   "/tools/jwt": "Developer", "/tools/regex": "Developer", "/tools/url-encode": "Developer",
   "/tools/number-base": "Developer", "/tools/text-diff": "Developer", "/tools/subnet": "Developer",
   "/tools/my-ip": "Developer", "/tools/csv-cleaner": "Developer", "/tools/markdown-table": "Developer",
+  "/tools/caesar": "Developer", "/tools/url-cleaner": "Developer", "/tools/morse": "Developer",
   "/tools/image-converter": "Design", "/tools/image-compressor": "Design", "/tools/qr-code": "Design",
   "/tools/placeholder": "Design", "/tools/color": "Design", "/tools/contrast": "Design",
   "/tools/shadows": "Design", "/tools/border-radius": "Design", "/tools/gradient": "Design",
   "/tools/gradient-text": "Design", "/tools/palette": "Design",
   "/tools/case-converter": "Text", "/tools/word-count": "Text", "/tools/word-frequency": "Text",
   "/tools/lorem": "Text", "/tools/titles": "Text", "/tools/text-cleaner": "Text",
-  "/tools/markdown-preview": "Text", "/tools/emoji": "Text", "/tools/morse": "Text",
-  "/tools/caesar": "Text", "/tools/number-to-words": "Text",
+  "/tools/markdown-preview": "Text", "/tools/emoji": "Text", "/tools/number-to-words": "Text",
   "/tools/timestamp": "Time", "/tools/date-math": "Time", "/tools/duration": "Time",
   "/tools/age": "Time", "/tools/holidays": "Time", "/tools/countdown": "Time",
   "/tools/stopwatch": "Time", "/tools/pomodoro": "Time", "/tools/timesheet": "Time", "/tools/metronome": "Time",
@@ -112,7 +112,7 @@ const catOf: Record<string, string> = {
   "/tools/password": "Utilities", "/tools/strength": "Utilities", "/tools/typing": "Utilities",
   "/tools/memory": "Utilities", "/tools/randomizer": "Utilities", "/tools/team-picker": "Utilities",
   "/tools/chart": "Utilities", "/tools/kanban": "Utilities", "/tools/resume": "Utilities",
-  "/tools/text-pdf": "Utilities", "/tools/url-cleaner": "Utilities", "/tools/habits": "Utilities",
+  "/tools/text-pdf": "Utilities", "/tools/habits": "Utilities",
   "/tools/weather": "Live", "/tools/country": "Live", "/tools/dictionary": "Live", "/tools/advice": "Live",
 };
 
@@ -651,27 +651,27 @@ export default function ToolsPage() {
         </p>
       </div>
 
-      <div className="sticky top-14 z-30 -mx-4 mt-8 bg-background/85 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
+      <div className="sticky top-14 z-30 -mx-4 mt-6 bg-background/95 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:mt-8 sm:px-6">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 shadow-sm">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={`Search ${tools.length} tools… (e.g. qr, emi, json)`}
-              className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none"
+              placeholder={`Search ${tools.length} tools…`}
+              className="min-w-0 flex-1 bg-transparent py-3 text-base outline-none sm:py-2 sm:text-sm"
             />
           </div>
-          <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1.5 sm:mx-0 sm:px-0" style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
             {CATS.map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => setCat(c)}
-                className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                className={`shrink-0 cursor-pointer rounded-full border px-5 py-3 text-base font-medium transition-all active:scale-95 sm:px-4 sm:py-2.5 sm:text-sm ${
                   cat === c
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                    : "border-border bg-card text-muted-foreground hover:bg-secondary active:bg-secondary"
                 }`}
               >
                 {c === "All" ? "◈ All" : c}
@@ -686,19 +686,19 @@ export default function ToolsPage() {
           Nothing matched &ldquo;{query}&rdquo;. Try another word?
         </p>
       ) : (
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {tools.map((tool) => (
+      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {filtered.map((tool) => (
           <Link
             key={tool.href}
             href={tool.href}
-            className="group rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5"
+            className="group rounded-2xl border border-border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 active:border-primary/50 active:shadow-lg sm:p-5"
           >
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground group-active:bg-primary group-active:text-primary-foreground">
               <tool.icon className="h-5 w-5" />
             </div>
             <h3 className="font-semibold leading-snug">{tool.title}</h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{tool.description}</p>
-            <span className="mt-3 inline-block text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+            <span className="mt-3 inline-block text-sm font-medium text-primary sm:text-xs sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
               Open →
             </span>
           </Link>
