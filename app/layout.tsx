@@ -96,7 +96,7 @@ export default function RootLayout({
                 href="/extractor"
                 className="inline-flex h-9 items-center rounded-lg bg-gradient-to-r from-primary to-blue-500 px-4 text-sm font-medium text-primary-foreground shadow-sm transition-shadow hover:shadow-md"
               >
-                Extract Video
+                <span className="hidden sm:inline">Extract Video</span><span className="sm:hidden">Extract</span>
               </Link>
               <ThemeToggle />
             </div>

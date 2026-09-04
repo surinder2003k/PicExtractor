@@ -184,3 +184,82 @@ button:active:not(:disabled),
   .print\:hidden { display: none !important; }
   body { background: white !important; }
 }
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Prevent horizontal overflow */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Larger touch targets */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  /* Inputs should be at least 16px font to prevent iOS zoom */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Better tap highlight */
+  a,
+  button {
+    -webkit-tap-highlight-color: color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+
+  /* Sticky header shadow on scroll */
+  header {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Prevent text overflow in cards */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Better spacing for stacked buttons */
+  .flex-col > * + * {
+    margin-top: 0.75rem;
+  }
+
+  /* Full-width select on mobile */
+  select {
+    width: 100%;
+  }
+}
+
+/* Safe area for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  footer {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* Touch device hover removal */
+@media (hover: none) {
+  .group:hover .group-hover\:translate-x-1 {
+    transform: none;
+  }
+  .hover\:-translate-y-1:hover,
+  .hover\:-translate-y-0\.5:hover {
+    transform: none;
+  }
+}
