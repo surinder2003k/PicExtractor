@@ -12,7 +12,10 @@ export interface ExtractOptions {
   height: number;
   /** Known duration in seconds. If omitted it is probed from the source. */
   duration?: number;
+  /** Number of parallel video-seeking workers. Lower = gentler on low-end machines. */
   concurrency?: number;
+  /** Number of off-main-thread encoding workers. */
+  maxEncoderWorkers?: number;
   signal: AbortSignal;
   onProgress: (p: ProgressState) => void;
 }
@@ -20,6 +23,10 @@ export interface ExtractOptions {
 const MAX_POOL_SIZE = 8;
 const SEEK_TIMEOUT_MS = 8000;
 const MAX_ENCODER_WORKERS = 4;
+/** Defaults favour responsiveness over raw speed — 8 simultaneous decoders
+ * make laptops stutter. 3 keeps extraction fast but leaves the UI smooth. */
+const DEFAULT_CONCURRENCY = 3;
+const DEFAULT_ENCODER_WORKERS = 2;
 
 /** Inline source for the encoding worker (avoids bundler-specific worker support). */
 const ENCODER_WORKER_SOURCE = `
@@ -51,6 +58,7 @@ const encoderPending = new Map<number, { resolve: (v: string) => void; reject: (
 let encoderNextId = 0;
 let encoderRR = 0;
 let encoderPoolReady = false;
+let encoderWorkerCount = 0;
 
 function supportsWorkerEncode(): boolean {
   return (
@@ -62,13 +70,18 @@ function supportsWorkerEncode(): boolean {
   );
 }
 
-function ensureEncoderPool(): boolean {
-  if (encoderPoolReady) return encoderWorkers.length > 0;
+function ensureEncoderPool(count: number): boolean {
+  count = Math.max(0, Math.min(Math.floor(count), MAX_ENCODER_WORKERS));
+  if (encoderPoolReady && encoderWorkerCount === count) return encoderWorkers.length > 0;
+  // Terminate any existing pool so the size can change between extractions.
+  encoderWorkers.forEach((w) => w.terminate());
+  encoderWorkers.length = 0;
   encoderPoolReady = true;
-  if (!supportsWorkerEncode()) return false;
+  encoderWorkerCount = count;
+  encoderPending.clear();
+  if (count === 0 || !supportsWorkerEncode()) return false;
   try {
     const blobUrl = URL.createObjectURL(new Blob([ENCODER_WORKER_SOURCE], { type: "application/javascript" }));
-    const count = Math.max(1, Math.min(MAX_ENCODER_WORKERS, navigator.hardwareConcurrency || 2));
     for (let i = 0; i < count; i++) {
       const w = new Worker(blobUrl);
       w.onmessage = (e) => {
@@ -222,7 +235,8 @@ export async function extractFrames(opts: ExtractOptions): Promise<ExtractResult
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  const useWorker = ensureEncoderPool();
+  const encoderCount = opts.maxEncoderWorkers ?? DEFAULT_ENCODER_WORKERS;
+  const useWorker = ensureEncoderPool(encoderCount);
 
   let completed = 0;
   let lastReport = 0;
@@ -296,7 +310,8 @@ export async function extractFrames(opts: ExtractOptions): Promise<ExtractResult
     }
   };
 
-  const poolSize = Math.max(1, Math.min(MAX_POOL_SIZE, total, navigator.hardwareConcurrency || 4));
+  const desiredPool = Math.floor(opts.concurrency ?? DEFAULT_CONCURRENCY);
+  const poolSize = Math.max(1, Math.min(desiredPool, total, MAX_POOL_SIZE));
   // Split timestamps into contiguous chunks, one per worker. Each chunk stays
   // within a narrow time window so all seeks are short forward hops.
   const chunks: number[][] = Array.from({ length: poolSize }, () => []);

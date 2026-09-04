@@ -40,15 +40,31 @@ const FORMATS: { value: FrameFormat; label: string }[] = [
 
 const SETTINGS_KEY = "picsnap-settings";
 
+type PerformanceMode = "low" | "balanced" | "high";
+
+const PERFORMANCE_PROFILES: Record<PerformanceMode, { label: string; concurrency: number; encoders: number }> = {
+  low: { label: "Low (gentle)", concurrency: 2, encoders: 1 },
+  balanced: { label: "Balanced", concurrency: 3, encoders: 2 },
+  high: { label: "High (max)", concurrency: 6, encoders: 4 },
+};
+
 interface SavedSettings {
   intervalMs: number;
   format: FrameFormat;
   quality: number;
   prefix?: string;
   gridCols?: number;
+  performance?: PerformanceMode;
 }
 
-const DEFAULT_SETTINGS = { intervalMs: 500, format: "jpeg" as FrameFormat, quality: 85, prefix: "", gridCols: 4 };
+const DEFAULT_SETTINGS = {
+  intervalMs: 500,
+  format: "jpeg" as FrameFormat,
+  quality: 85,
+  prefix: "",
+  gridCols: 4,
+  performance: "balanced" as PerformanceMode,
+};
 
 function loadSettings(): SavedSettings {
   if (typeof window === "undefined") return { ...DEFAULT_SETTINGS };
@@ -62,6 +78,10 @@ function loadSettings(): SavedSettings {
       quality: typeof parsed.quality === "number" ? parsed.quality : DEFAULT_SETTINGS.quality,
       prefix: typeof parsed.prefix === "string" ? parsed.prefix : "",
       gridCols: typeof parsed.gridCols === "number" ? parsed.gridCols : DEFAULT_SETTINGS.gridCols,
+      performance:
+        parsed.performance && PERFORMANCE_PROFILES[parsed.performance]
+          ? parsed.performance
+          : DEFAULT_SETTINGS.performance,
     };
   } catch {
     return { ...DEFAULT_SETTINGS };
@@ -90,6 +110,7 @@ export default function Extractor() {
   const [quality, setQuality] = useState(loadSettings().quality);
   const [prefix, setPrefix] = useState<string>(loadSettings().prefix ?? "");
   const [gridCols, setGridCols] = useState<number>(loadSettings().gridCols ?? DEFAULT_SETTINGS.gridCols);
+  const [performance, setPerformance] = useState<PerformanceMode>(loadSettings().performance ?? "balanced");
   const [frameFilter, setFrameFilter] = useState("");
   const [sheetBusy, setSheetBusy] = useState(false);
   const [startStr, setStartStr] = useState("00:00:00.000");
@@ -227,6 +248,8 @@ export default function Extractor() {
         width: videoWidth,
         height: videoHeight,
         duration,
+        concurrency: PERFORMANCE_PROFILES[performance].concurrency,
+        maxEncoderWorkers: PERFORMANCE_PROFILES[performance].encoders,
         signal: controller.signal,
         onProgress: (p) => setProgress({ done: p.done, total: p.total, elapsedMs: p.elapsedMs }),
       });
@@ -389,11 +412,14 @@ export default function Extractor() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ intervalMs, format, quality, prefix, gridCols }));
+      localStorage.setItem(
+        SETTINGS_KEY,
+        JSON.stringify({ intervalMs, format, quality, prefix, gridCols, performance })
+      );
     } catch {
       // ignore storage failures (private mode etc.)
     }
-  }, [intervalMs, format, quality, prefix, gridCols]);
+  }, [intervalMs, format, quality, prefix, gridCols, performance]);
 
   // Global keyboard shortcuts: Space = play/pause, C = capture current frame,
   // [ / ] select previous/next frame.
@@ -544,6 +570,37 @@ export default function Extractor() {
                     />
                   </div>
                 )}
+                <div>
+                  <p className="mb-1 text-muted-foreground">Extraction Speed</p>
+                  <div className="flex gap-1 rounded-lg border border-border p-1">
+                    {(Object.keys(PERFORMANCE_PROFILES) as PerformanceMode[]).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setPerformance(mode)}
+                        disabled={extracting}
+                        className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+                          performance === mode
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:bg-secondary"
+                        } disabled:opacity-50`}
+                        aria-pressed={performance === mode}
+                        title={
+                          mode === "balanced"
+                            ? "3 parallel extractors — smooth on most laptops"
+                            : mode === "low"
+                              ? "2 parallel extractors — gentlest, best for slower machines"
+                              : "6 parallel extractors — fastest, heavier on CPU"
+                        }
+                      >
+                        {PERFORMANCE_PROFILES[mode].label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    Lower = smoother laptop, higher = faster. Change before clicking Extract.
+                  </p>
+                </div>
                 <div className="grid grid-cols-2 gap-3 pt-1">
                   <div>
                     <p className="mb-1 text-muted-foreground">Start Time</p>
