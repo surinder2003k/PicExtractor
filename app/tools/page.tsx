@@ -47,6 +47,11 @@ import {
   FileUser,
   TrendingUp,
   Accessibility,
+  Brain,
+  BarChart3,
+  Scale,
+  PenLine,
+  Hourglass,
 } from "lucide-react";
 
 const tools = [
@@ -355,6 +360,36 @@ const tools = [
     title: "Date Add / Subtract",
     description: "Days from today, deadlines, due dates.",
     href: "/tools/date-math",
+  },
+  {
+    icon: Brain,
+    title: "Memory Match",
+    description: "Fun brain-break game — find all pairs.",
+    href: "/tools/memory",
+  },
+  {
+    icon: BarChart3,
+    title: "Bar Chart Maker",
+    description: "Paste data, get a PNG chart for slides.",
+    href: "/tools/chart",
+  },
+  {
+    icon: Scale,
+    title: "Ideal Weight",
+    description: "Robinson & Devine formulas + BMI band.",
+    href: "/tools/ideal-weight",
+  },
+  {
+    icon: PenLine,
+    title: "Blog Title Generator",
+    description: "Proven headline patterns for any topic.",
+    href: "/tools/titles",
+  },
+  {
+    icon: Hourglass,
+    title: "Countdown Timer",
+    description: "Meetings, sprints, and breaks — beep on zero.",
+    href: "/tools/countdown",
   },
 ];
 
